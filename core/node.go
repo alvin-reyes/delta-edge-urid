@@ -3,7 +3,7 @@ package core
 import (
 	"context"
 	"fmt"
-	"github.com/application-research/edge-urid/config"
+	"github.com/alvin-reyes/edge-urid/config"
 	"github.com/application-research/whypfs-core"
 	"github.com/filecoin-project/go-address"
 	"github.com/ipfs/go-unixfsnode"

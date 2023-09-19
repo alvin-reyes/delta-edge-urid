@@ -13,7 +13,7 @@ package jobs
 //	"strconv"
 //	"time"
 //
-//	"github.com/application-research/edge-urid/core"
+//	"github.com/alvin-reyes/edge-urid/core"
 //	"github.com/spf13/viper"
 //)
 //

@@ -2,7 +2,7 @@ package api
 
 import (
 	"fmt"
-	"github.com/application-research/edge-urid/core"
+	"github.com/alvin-reyes/edge-urid/core"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"strconv"
