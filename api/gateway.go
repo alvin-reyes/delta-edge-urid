@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/application-research/edge-ur/core"
+	"github.com/application-research/edge-urid/core"
 	"github.com/application-research/whypfs-core"
 	"github.com/ipfs/boxo/ipld/merkledag"
 	"github.com/ipfs/boxo/ipld/unixfs"

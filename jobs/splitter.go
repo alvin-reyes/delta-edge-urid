@@ -3,8 +3,8 @@ package jobs
 import (
 	"bytes"
 	"context"
-	"github.com/application-research/edge-ur/core"
-	"github.com/application-research/edge-ur/utils"
+	"github.com/application-research/edge-urid/core"
+	"github.com/application-research/edge-urid/utils"
 	"github.com/google/uuid"
 	"io"
 	"time"
