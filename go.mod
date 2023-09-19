@@ -1,4 +1,4 @@
-module github.com/application-research/edge-ur
+module github.com/alvin-reyes/edge-urid
 
 go 1.18
 

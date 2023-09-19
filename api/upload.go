@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/application-research/edge-ur/jobs"
-	"github.com/application-research/edge-ur/utils"
+	"github.com/alvin-reyes/edge-urid/jobs"
+	"github.com/alvin-reyes/edge-urid/utils"
 	"github.com/google/uuid"
 	"github.com/ipfs/go-cid"
 	"github.com/ipld/go-car"
@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/application-research/edge-ur/core"
+	"github.com/alvin-reyes/edge-urid/core"
 )
 
 type CidRequest struct {

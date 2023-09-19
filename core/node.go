@@ -3,7 +3,7 @@ package core
 import (
 	"context"
 	"fmt"
-	"github.com/application-research/edge-ur/config"
+	"github.com/alvin-reyes/edge-urid/config"
 	"github.com/ipfs/go-datastore"
 	dsync "github.com/ipfs/go-datastore/sync"
 	"io/ioutil"
