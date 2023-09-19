@@ -3,12 +3,9 @@ package core
 import (
 	"context"
 	"fmt"
-	"github.com/alvin-reyes/edge-urid/config"
-	"github.com/application-research/whypfs-core"
-	"github.com/filecoin-project/go-address"
-	"github.com/ipfs/go-unixfsnode"
-	"github.com/ipld/go-ipld-prime"
-	"github.com/multiformats/go-multiaddr"
+	"github.com/application-research/edge-ur/config"
+	"github.com/ipfs/go-datastore"
+	dsync "github.com/ipfs/go-datastore/sync"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -18,6 +15,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/application-research/whypfs-core"
+	"github.com/filecoin-project/go-address"
 	"github.com/filecoin-project/lotus/chain/types"
 	"github.com/filecoin-project/lotus/chain/wallet/key"
 	"github.com/ipfs/boxo/blockservice"
@@ -26,11 +25,14 @@ import (
 	"github.com/ipfs/boxo/path/resolver"
 	blockstore "github.com/ipfs/go-ipfs-blockstore"
 	mdagipld "github.com/ipfs/go-ipld-format"
+	"github.com/ipfs/go-unixfsnode"
 	dagpb "github.com/ipld/go-codec-dagpb"
+	"github.com/ipld/go-ipld-prime"
 	ipldbasicnode "github.com/ipld/go-ipld-prime/node/basic"
 	"github.com/ipld/go-ipld-prime/schema"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/multiformats/go-multiaddr"
 	"gorm.io/gorm"
 )
 
@@ -76,15 +78,15 @@ func NewEdgeNode(ctx context.Context, cfg config.EdgeConfig) (*LightNode, error)
 	}
 	fmt.Println("cfg.Node.Repo is: ", cfg.Node.Repo)
 	fmt.Println("cfg.Node.DsRepo is: ", cfg.Node.DsRepo)
-	//ds := dsync.MutexWrap(datastore.NewMapDatastore())
+	ds := dsync.MutexWrap(datastore.NewMapDatastore())
 	//ds, err := levelds.NewDatastore(cfg.Node.DsRepo, nil)
 	if err != nil {
 		panic(err)
 	}
 	params := whypfs.NewNodeParams{
-		Ctx: ctx,
-		//Datastore: ds,
-		Repo: cfg.Node.Repo,
+		Ctx:       ctx,
+		Datastore: ds,
+		Repo:      cfg.Node.Repo,
 	}
 
 	params.Config = params.ConfigurationBuilder(newConfig)

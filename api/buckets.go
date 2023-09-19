@@ -1,8 +1,7 @@
 package api
 
 import (
-	"fmt"
-	"github.com/alvin-reyes/edge-urid/core"
+	"github.com/application-research/edge-ur/core"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"strconv"
@@ -17,7 +16,7 @@ type BucketsResponse struct {
 		PieceCid        string `json:"piece_cid"`
 		PaddedPieceSize int64  `json:"padded_piece_size"`
 	} `json:"piece_commitment"`
-	//PieceCid           string `json:"piece_cid"`
+	PieceCid           string `json:"piece_cid"`
 	PayloadCid         string `json:"payload_cid"`
 	DirCid             string `json:"dir_cid"`
 	TransferParameters struct {
@@ -54,12 +53,6 @@ type CreateBucketRequest struct {
 // The function `handleGetInProgressBuckets` retrieves a list of in-progress buckets and their associated contents.
 func handleGetInProgressBuckets(node *core.LightNode) func(c echo.Context) error {
 	return func(c echo.Context) error {
-		showContentParam := c.QueryParam("show_content")
-		var showContent = false
-		if showContentParam == "true" {
-			showContent = true
-		}
-
 		pageNum, err := strconv.Atoi(c.QueryParam("page"))
 		if err != nil || pageNum <= 0 {
 			pageNum = 1
@@ -78,6 +71,7 @@ func handleGetInProgressBuckets(node *core.LightNode) func(c echo.Context) error
 		for _, bucket := range buckets {
 			response := BucketsResponse{
 				BucketUUID:     bucket.Uuid,
+				PieceCid:       bucket.PieceCid,
 				PayloadCid:     bucket.Cid,
 				DirCid:         bucket.DirCid,
 				Status:         bucket.Status,
@@ -89,20 +83,15 @@ func handleGetInProgressBuckets(node *core.LightNode) func(c echo.Context) error
 			response.PieceCommitment.PaddedPieceSize = bucket.PieceSize
 			response.PieceCommitment.PieceCid = bucket.PieceCid
 			response.TransferParameters.URL = node.Api.Scheme + node.Config.Node.GwHost + "/gw/" + bucket.Cid
-
-			// get all the content
-			if showContent {
-				var contents []core.Content
-				node.DB.Model(&core.Content{}).Where("bucket_uuid = ?", bucket.Uuid).Find(&contents)
-				if len(contents) > 0 {
-					for i := range contents {
-						contents[i].RequestingApiKey = ""
-					}
-					response.Contents = contents
-				}
-			}
 			bucketsResponse = append(bucketsResponse, response)
 
+			// get all the content
+			var contents []core.Content
+			node.DB.Model(&core.Content{}).Where("bucket_uuid = ?", bucket.Uuid).Find(&contents)
+			for i := range contents {
+				contents[i].RequestingApiKey = ""
+			}
+			bucketsResponse[len(bucketsResponse)-1].Contents = contents
 		}
 
 		if len(bucketsResponse) == 0 {
@@ -201,12 +190,6 @@ func handleDeleteBucket(node *core.LightNode) func(c echo.Context) error {
 func handleGetOpenBuckets(node *core.LightNode) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		assignMiner := c.QueryParam("miner")
-		showContentParam := c.QueryParam("show_content")
-
-		var showContent = false
-		if showContentParam == "true" {
-			showContent = true
-		}
 
 		pageNum, err := strconv.Atoi(c.QueryParam("page"))
 		if err != nil || pageNum <= 0 {
@@ -226,6 +209,7 @@ func handleGetOpenBuckets(node *core.LightNode) func(c echo.Context) error {
 		for _, bucket := range buckets {
 			response := BucketsResponse{
 				BucketUUID:     bucket.Uuid,
+				PieceCid:       bucket.PieceCid,
 				PayloadCid:     bucket.Cid,
 				DirCid:         bucket.DirCid,
 				Status:         bucket.Status,
@@ -243,20 +227,6 @@ func handleGetOpenBuckets(node *core.LightNode) func(c echo.Context) error {
 			response.PieceCommitment.PaddedPieceSize = bucket.PieceSize
 			response.PieceCommitment.PieceCid = bucket.PieceCid
 			response.TransferParameters.URL = node.Api.Scheme + node.Config.Node.GwHost + "/gw/" + bucket.Cid
-
-			if showContent {
-				// get all the content
-				var contents []core.Content
-				node.DB.Model(&core.Content{}).Where("bucket_uuid = ?", bucket.Uuid).Find(&contents)
-				fmt.Println(contents)
-				if len(contents) > 0 {
-					for i := range contents {
-						contents[i].RequestingApiKey = ""
-					}
-					response.Contents = contents
-				}
-			}
-
 			bucketsResponse = append(bucketsResponse, response)
 
 		}

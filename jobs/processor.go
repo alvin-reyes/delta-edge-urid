@@ -3,7 +3,7 @@ package jobs
 import (
 	"context"
 
-	"github.com/alvin-reyes/edge-urid/core"
+	"github.com/application-research/edge-ur/core"
 )
 
 var DELTA_UPLOAD_API = ""

@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/alvin-reyes/edge-urid/core"
+	"github.com/application-research/edge-ur/core"
 	logging "github.com/ipfs/go-log/v2"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"

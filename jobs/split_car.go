@@ -1,7 +1,7 @@
 package jobs
 
 import (
-	"github.com/alvin-reyes/edge-urid/core"
+	"github.com/application-research/edge-ur/core"
 )
 
 type FileSplitterProcessor struct {

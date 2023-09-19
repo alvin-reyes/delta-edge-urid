@@ -3,11 +3,11 @@
 package main
 
 import (
-	"github.com/alvin-reyes/edge-urid/config"
+	"github.com/application-research/edge-ur/config"
 	_ "net/http"
 	"os"
 
-	"github.com/alvin-reyes/edge-urid/cmd"
+	"github.com/application-research/edge-ur/cmd"
 	logging "github.com/ipfs/go-log/v2"
 	"github.com/urfave/cli/v2"
 )

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/alvin-reyes/edge-urid/core"
+	"github.com/application-research/edge-ur/core"
 	"github.com/ipfs/go-cid"
 	"github.com/ipfs/go-merkledag"
 	"github.com/multiformats/go-multihash"

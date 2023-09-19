@@ -2,8 +2,8 @@ package api
 
 import (
 	"context"
-	"github.com/alvin-reyes/edge-urid/core"
-	"github.com/alvin-reyes/edge-urid/jobs"
+	"github.com/application-research/edge-ur/core"
+	"github.com/application-research/edge-ur/jobs"
 	"github.com/ipfs/go-cid"
 	"github.com/labstack/echo/v4"
 )

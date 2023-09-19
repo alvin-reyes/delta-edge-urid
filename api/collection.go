@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/alvin-reyes/edge-urid/core"
+	"github.com/application-research/edge-ur/core"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"strings"
@@ -43,6 +43,7 @@ func handleGetCollections(node *core.LightNode) func(c echo.Context) error {
 		for _, bucket := range buckets {
 			response := BucketsResponse{
 				BucketUUID:     bucket.Uuid,
+				PieceCid:       bucket.PieceCid,
 				PayloadCid:     bucket.Cid,
 				DirCid:         bucket.DirCid,
 				Status:         bucket.Status,
