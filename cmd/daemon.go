@@ -26,6 +26,9 @@ func DaemonCmd(cfg *config.EdgeConfig) []*cli.Command {
 				Name: "repo",
 			},
 			&cli.StringFlag{
+				Name: "host-ip",
+			},
+			&cli.StringFlag{
 				Name: "port",
 			},
 		},
@@ -36,10 +39,17 @@ func DaemonCmd(cfg *config.EdgeConfig) []*cli.Command {
 			fmt.Println("Architecture:", runtime.GOARCH)
 			fmt.Println("Hostname:", core.GetHostname())
 
-			ip, err := core.GetPublicIP()
-			if err != nil {
-				fmt.Println("Error getting public IP:", err)
+			var ip string
+			if c.String("host-ip") != "" {
+				ip = c.String("host-ip")
+			} else {
+				publicIp, err := core.GetPublicIP()
+				if err != nil {
+					fmt.Println("Error getting public IP:", err)
+				}
+				ip = publicIp
 			}
+
 			fmt.Println("Public IP:", ip)
 			fmt.Println(utils.Blue + "Starting Edge daemon..." + utils.Reset)
 
