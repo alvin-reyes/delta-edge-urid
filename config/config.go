@@ -23,6 +23,7 @@ type EdgeConfig struct {
 		DsRepo                string `env:"DS_REPO" envDefault:"./whypfs-ds"`
 		GwHost                string `env:"HOST" envDefault:"localhost"`
 		Port                  int    `env:"PORT" envDefault:"1414"`
+		ListenAddrsIp         string `env:"LISTEN_ADDRS_IP" envDefault:""`
 		AdminApiKey           string `env:"ADMIN_API_KEY" envDefault:"admin"`
 		DefaultCollectionName string `env:"DEFAULT_COLLECTION_NAME" envDefault:"default"`
 	}

@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/alvin-reyes/edge-urid/config"
 	"github.com/ipfs/go-datastore"
@@ -64,11 +65,10 @@ func NewEdgeNode(ctx context.Context, cfg config.EdgeConfig) (*LightNode, error)
 
 	db, err := OpenDatabase(cfg)
 	// node
-	publicIp, err := GetPublicIP()
+	publicIp, err := GetPublicIP(cfg)
 	newConfig := &whypfs.Config{
 		ListenAddrs: []string{
 			"/ip4/0.0.0.0/tcp/6745",
-			"/ip4/0.0.0.0/udp/6746/quic",
 			"/ip4/" + publicIp + "/tcp/6745",
 		},
 		AnnounceAddrs: []string{
@@ -141,7 +141,7 @@ func (ln *LightNode) GetLocalhostOrigins() []string {
 		origins = append(origins, peerInfo.ID.String())
 	}
 
-	publicIp, err := GetPublicIP()
+	publicIp, err := GetPublicIP(*ln.Config)
 	if err != nil {
 		panic(err)
 	}
@@ -149,17 +149,35 @@ func (ln *LightNode) GetLocalhostOrigins() []string {
 	return origins
 }
 
-func GetPublicIP() (string, error) {
-	resp, err := http.Get("https://ifconfig.me") // important to get the public ip if possible.
+type IPResponse struct {
+	IP string `json:"ip"`
+}
+
+func GetPublicIP(config config.EdgeConfig) (string, error) {
+	if config.Node.ListenAddrsIp != "" {
+		return config.Node.ListenAddrsIp, nil
+	}
+	resp, err := http.Get("http://ipinfo.io/json")
 	if err != nil {
+		fmt.Println("Error:", err)
 		return "", err
 	}
 	defer resp.Body.Close()
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		fmt.Println("Error:", err)
 		return "", err
 	}
-	return string(body), nil
+
+	var ipResp IPResponse
+	err = json.Unmarshal(body, &ipResp)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return "", err
+	}
+
+	return ipResp.IP, nil
 }
 
 func (ln *LightNode) ConnectToDelegates(ctx context.Context, delegates []string) error {
