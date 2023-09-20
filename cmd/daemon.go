@@ -43,7 +43,7 @@ func DaemonCmd(cfg *config.EdgeConfig) []*cli.Command {
 			if c.String("host-ip") != "" {
 				ip = c.String("host-ip")
 			} else {
-				publicIp, err := core.GetPublicIP()
+				publicIp, err := core.GetPublicIP(*cfg)
 				if err != nil {
 					fmt.Println("Error getting public IP:", err)
 				}
