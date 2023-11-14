@@ -343,22 +343,12 @@ func handleCidsToCarBucket(node *core.LightNode) func(c echo.Context) error {
 // splitting the file if necessary and updating the bucket's size.
 func handleUploadToCarBucket(node *core.LightNode) func(c echo.Context) error {
 	return func(c echo.Context) error {
-		authorizationString := c.Request().Header.Get("Authorization")
-		authParts := strings.Split(authorizationString, " ")
+		//authorizationString := c.Request().Header.Get("Authorization")
+		//authParts := strings.Split(authorizationString, " ")
 		collectionName := c.FormValue("collection_name")
 
-		// Check capacity if needed
-		if node.Config.Common.CapacityLimitPerKeyInBytes > 0 {
-			if err := validateCapacityLimit(node, authParts[1]); err != nil {
-				return c.JSON(500, UploadResponse{
-					Status:  "error",
-					Message: err.Error(),
-				})
-			}
-		}
-
 		// check if tag exists, if it does, get the ID
-		fmt.Println(collectionName)
+
 		if collectionName == "" {
 			collectionName = node.Config.Node.DefaultCollectionName
 		}
@@ -402,15 +392,14 @@ func handleUploadToCarBucket(node *core.LightNode) func(c echo.Context) error {
 
 		if file.Size > node.Config.Common.MaxSizeToSplit {
 			newContent := core.Content{
-				Name:             file.Filename,
-				Size:             file.Size,
-				Cid:              addNode.Cid().String(),
-				CollectionName:   collectionName,
-				RequestingApiKey: authParts[1],
-				Status:           utils.STATUS_PINNED,
-				MakeDeal:         true,
-				CreatedAt:        time.Now(),
-				UpdatedAt:        time.Now(),
+				Name:           file.Filename,
+				Size:           file.Size,
+				Cid:            addNode.Cid().String(),
+				CollectionName: collectionName,
+				Status:         utils.STATUS_PINNED,
+				MakeDeal:       true,
+				CreatedAt:      time.Now(),
+				UpdatedAt:      time.Now(),
 			}
 
 			node.DB.Create(&newContent)
@@ -444,14 +433,13 @@ func handleUploadToCarBucket(node *core.LightNode) func(c echo.Context) error {
 					})
 				}
 				bucket = core.Bucket{
-					Status:           "open",
-					Name:             collectionName,
-					RequestingApiKey: authParts[1],
-					Uuid:             bucketUuid.String(),
-					PolicyId:         policy.ID,
-					Size:             file.Size,
-					CreatedAt:        time.Now(),
-					UpdatedAt:        time.Now(),
+					Status:    "open",
+					Name:      collectionName,
+					Uuid:      bucketUuid.String(),
+					PolicyId:  policy.ID,
+					Size:      file.Size,
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
 				}
 				node.DB.Create(&bucket)
 			} else {
@@ -462,16 +450,15 @@ func handleUploadToCarBucket(node *core.LightNode) func(c echo.Context) error {
 			fmt.Println("bucketUuid", bucket.Uuid, "bucket.Size", bucket.Size)
 
 			newContent := core.Content{
-				Name:             file.Filename,
-				Size:             file.Size,
-				Cid:              addNode.Cid().String(),
-				RequestingApiKey: authParts[1],
-				Status:           utils.STATUS_PINNED,
-				CollectionName:   collectionName,
-				BucketUuid:       bucket.Uuid,
-				MakeDeal:         true,
-				CreatedAt:        time.Now(),
-				UpdatedAt:        time.Now(),
+				Name:           file.Filename,
+				Size:           file.Size,
+				Cid:            addNode.Cid().String(),
+				Status:         utils.STATUS_PINNED,
+				CollectionName: collectionName,
+				BucketUuid:     bucket.Uuid,
+				MakeDeal:       true,
+				CreatedAt:      time.Now(),
+				UpdatedAt:      time.Now(),
 			}
 
 			node.DB.Create(&newContent)

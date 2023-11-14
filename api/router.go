@@ -1,12 +1,10 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
@@ -90,64 +88,7 @@ func InitializeEchoRouterConfig(ln *core.LightNode) {
 	ConfigureNodeInfoRouter(defaultOpenRoute, ln)
 
 	apiGroup := e.Group("/api/v1")
-	apiGroup.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			authorizationString := c.Request().Header.Get("Authorization")
-			authParts := strings.Split(authorizationString, " ")
 
-			if len(authParts) != 2 {
-				return c.JSON(http.StatusInternalServerError, HttpErrorResponse{
-					Error: HttpError{
-						Code:    http.StatusInternalServerError,
-						Reason:  http.StatusText(http.StatusInternalServerError),
-						Details: "Invalid Authorization Header",
-					},
-				})
-			}
-			response, err := http.Post(
-				ln.Config.ExternalApi.AuthSvcUrl+"/check-api-key",
-				"application/json",
-				strings.NewReader(fmt.Sprintf(`{"token": "%s"}`, authParts[1])),
-			)
-
-			if err != nil {
-				log.Errorf("handler error: %s", err)
-				return c.JSON(http.StatusInternalServerError, HttpErrorResponse{
-					Error: HttpError{
-						Code:    http.StatusInternalServerError,
-						Reason:  http.StatusText(http.StatusInternalServerError),
-						Details: err.Error(),
-					},
-				})
-			}
-
-			authResp, err := GetAuthResponse(response)
-			if err != nil {
-				log.Errorf("handler error: %s", err)
-				return c.JSON(http.StatusInternalServerError, HttpErrorResponse{
-					Error: HttpError{
-						Code:    http.StatusInternalServerError,
-						Reason:  http.StatusText(http.StatusInternalServerError),
-						Details: err.Error(),
-					},
-				})
-			}
-
-			if authResp.Result.Validated == false {
-				return c.JSON(http.StatusUnauthorized, HttpErrorResponse{
-					Error: HttpError{
-						Code:    http.StatusUnauthorized,
-						Reason:  http.StatusText(http.StatusUnauthorized),
-						Details: authResp.Result.Details,
-					},
-				})
-			}
-			if authResp.Result.Validated == true {
-				return next(c)
-			}
-			return next(c)
-		}
-	})
 	ConfigureRetrieveRouter(apiGroup, ln)
 	ConfigureUploadRouter(apiGroup, ln)
 	ConfigureBucketsRouter(defaultOpenRoute, ln)
@@ -159,27 +100,6 @@ func InitializeEchoRouterConfig(ln *core.LightNode) {
 
 	addrPort := fmt.Sprintf("0.0.0.0:%d", ln.Config.Node.Port)
 	e.Logger.Fatal(e.Start(addrPort)) // configuration
-}
-
-func GetAuthResponse(resp *http.Response) (AuthResponse, error) {
-
-	jsonBody := AuthResponse{}
-	err := json.NewDecoder(resp.Body).Decode(&jsonBody)
-	if err != nil {
-
-		log.Error("empty json body")
-		return AuthResponse{
-			Result: struct {
-				Validated bool   `json:"validated"`
-				Details   string `json:"details"`
-			}{
-				Validated: false,
-				Details:   "empty json body",
-			},
-		}, nil
-	}
-
-	return jsonBody, nil
 }
 
 func ErrorHandler(err error, c echo.Context) {
